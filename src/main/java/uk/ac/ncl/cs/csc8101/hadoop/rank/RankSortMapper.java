@@ -35,15 +35,11 @@ public class RankSortMapper extends Mapper<LongWritable, Text, FloatWritable, Te
         String[] fullList = value.toString().split("\t");
         if (fullList.length >= 2 && !fullList[0].equals("") && !fullList[1].equals("")) {
             page = fullList[0];
-
             rank = fullList[1];
-
-            System.out.println("Key:" + rank);
-
+      //      System.out.println("Key:" + rank);
             Float rankValue = Float.parseFloat(rank);
-
-            System.out.println("Value:" + page);
-
+     //       System.out.println("Value:" + page);
+            //Writing the rank and page to output
             context.write(new FloatWritable(rankValue), new Text(page));
         }
 

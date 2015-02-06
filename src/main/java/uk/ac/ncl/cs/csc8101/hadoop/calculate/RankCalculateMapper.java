@@ -38,33 +38,30 @@ public class RankCalculateMapper extends Mapper<LongWritable, Text, Text, Text> 
         if (valueList.isEmpty()) {
             return;
         }
-
         // Getting the source page which is the first element in the parsed list
         Text sourcePage = new Text(valueList.get(0));
         valueList.remove(0);
-
         // Getting the rank
         String rank = valueList.get(0);
         valueList.remove(0);
-
-
+        // Number of target pages
         String targetPageCount = Integer.toString(valueList.size());
-
-        System.out.println(sourcePage);
-
+        //System.out.println(sourcePage);
         // Iterating though each target page to generate key value pair
         for (String page : valueList) {
-
             // System.out.println(page + "," + key + "\t" + rank + "\t" + targetPageCount);
+            // Writing output page  sourcePage  rank    targetPageCount ex: A   B   1.3 2
             context.write(new Text(page), new Text(sourcePage + "\t" + rank + "\t" + targetPageCount));
         }
-
         //Mapping special case of source page
-        System.out.println(key + ",!\t" + StringUtils.join(",", valueList));
+       // System.out.println(key + ",!\t" + StringUtils.join(",", valueList));
+        // Writing special case output sourcePage  !    targetPages ex: A   !   C,D
         context.write(new Text(sourcePage), new Text("!\t" + StringUtils.join(",", valueList)));
 
     }
 
+
+    // Method to return the parsed values as a List, Makes the mapping easier
     private static List<String> getValues(Text ipString) throws CharacterCodingException {
 
         List<String> outputList = new ArrayList<String>();
@@ -79,17 +76,13 @@ public class RankCalculateMapper extends Mapper<LongWritable, Text, Text, Text> 
 
             //   System.out.println("Key:" + key);
             outputList.add(key);
-
-
             //Extracting value of rank
             if (fullList.length>=2&&!fullList[1].equals("")) {
                 rank = fullList[1];
                 //Adding rank to the output list
                 outputList.add(rank);
             }
-
             //    System.out.println("Rank:" + rank);
-
             //Extracting the comma separated list of target pages
             if (fullList.length>=3&&!fullList[2].equals("")) {
                 pageList = fullList[2];
@@ -97,8 +90,6 @@ public class RankCalculateMapper extends Mapper<LongWritable, Text, Text, Text> 
                 outputList.addAll(StringUtils.getStringCollection(pageList));
             }
             //     System.out.println("pageList:" + pageList);
-
-
 //        System.out.println("OuputList:" + outputList);
 //        System.out.println(outputList.get0(0));
         }

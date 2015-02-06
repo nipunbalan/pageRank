@@ -37,50 +37,44 @@ public class RankCalculateReducer extends Reducer<Text, Text, Text, Text> {
         Double rank = 0.0;
         String citedPages = "";
         Boolean firstSpecialCase = true;
+        //Declaring Damping Factor
         Double dampingFactor = 0.85;
-        //   System.out.println(values);
         for (Text valueText : values) {
 
             String value = valueText.toString();
             String[] strings = value.split("\t");
 
-//            for (String str : strings) {
-//                System.out.println("Strings:" + str);
-//            }
-
-
-            //If not special case of source page
+            //If its not a special case of '!'
             if (!strings[0].equals("!")) {
                 if (strings.length > 1 && strings[1] != null && !strings[1].equals("")) {
                     //Getting rank
                     Double pagerank = Double.parseDouble(strings[1]);
-
                     //Getting number of citations
                     int cites = Integer.parseInt(strings[2]);
                     if (cites != 0) {
+                        //Adding rank/cites of each citations
                         rank = rank + (pagerank / cites);
                     }
                 }
 
-            } else {
-
+            }
+            // Special case when '!' comes as rank.
+            else {
                 if (strings.length >= 2 && !strings[1].equals("")) {
+                    // Adding comma to citedPage list if its not the first occurence
                     if (!firstSpecialCase) {
                         citedPages = citedPages + ",";
                     }
                     citedPages = citedPages + strings[1];
                 }
 
-                //Todo Handle Special case
-
             }
         }
-//        if (citedPages != null && !citedPages.equals("")) {
-//            citedPages = " " + citedPages;
-//        }
 
-
+        // Calculating the rank as per the PageRank formula
         rank = (1 - dampingFactor) + dampingFactor * (rank);
+
+        // Rounding the output to 4 decimals
         DecimalFormat df = new DecimalFormat("###.####");
 
         Text opValue = new Text("");
@@ -90,11 +84,8 @@ public class RankCalculateReducer extends Reducer<Text, Text, Text, Text> {
         } else {
             opValue = new Text(df.format(rank));
         }
-
-
+        // Writing the output with key as the page and value as the calculated rank
         context.write(key, opValue);
         // System.out.println("(" + key + ",\"" + df.format(rank) + citedPages + "\")");
-
-
     }
 }
